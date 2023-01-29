@@ -1,0 +1,66 @@
+{% extends 'layout.html' %} {% block content %}
+<h1>Show Taiwan stock candlestick chart</h1>
+
+<form action="/get-stock-info" method="get">
+  <div class="input-group mb-3">
+    <input
+      type="text"
+      id="stock-code"
+      class="form-control"
+      placeholder="Stock Code"
+      aria-label="Stock Code"
+      aria-describedby="basic-addon1"
+    />
+    <select
+      id="stock-type"
+      class="form-select"
+      aria-label="Default select example"
+    >
+      <option selected value="tw">tw (上市)</option>
+      <option value="two">two (上櫃)</option>
+    </select>
+    <button id="submit" type="button" class="btn btn-outline-primary">
+      Submit
+    </button>
+  </div>
+</form>
+
+<h4 id="error-message" style="display: none">Data not found!</h4>
+
+<img id="price-image" alt="" height="600" />
+
+<script>
+  $(document).ready(function () {
+    function getStockInfo() {
+      $.ajax({
+        method: "POST",
+        url: "/get-stock-info",
+        data: {
+          type: $("#stock-type").find(":selected").val(),
+          code: $("#stock-code").val(),
+        },
+        success: function (res) {
+          $("#price-image").attr("src", "");
+          if (res.status) {
+            $("#error-message").hide();
+            $("#price-image").attr("src", `data:image/png;base64,${res.image}`);
+          } else {
+            $("#error-message").show();
+          }
+        },
+      });
+    }
+
+    $("#stock-code").keypress(function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        getStockInfo();
+      }
+    });
+
+    $("#submit").click(function () {
+      getStockInfo();
+    });
+  });
+</script>
+{% endblock %}

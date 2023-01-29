@@ -1,0 +1,5 @@
+.vscode
+.env
+db.*
+__pycache__/
+uwsgi.ini
